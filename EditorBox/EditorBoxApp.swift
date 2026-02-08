@@ -10,14 +10,13 @@ import SwiftData
 
 @main
 struct EditorBoxApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    /// アプリ全体で共有する SwiftData コンテナ
+    private var sharedModelContainer: ModelContainer = {
+        let schema = Schema([Idea.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: [configuration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
