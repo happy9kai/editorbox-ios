@@ -12,7 +12,7 @@ import SwiftData
 struct EditorBoxApp: App {
     /// アプリ全体で共有する SwiftData コンテナ
     private var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Idea.self])
+        let schema = Schema([Idea.self, IdeaAttachment.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

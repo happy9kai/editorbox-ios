@@ -16,5 +16,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Idea.self, inMemory: true)
+        .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
 }

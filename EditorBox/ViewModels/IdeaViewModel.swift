@@ -13,6 +13,7 @@ final class IdeaViewModel: ObservableObject {
     @Published var title: String
     @Published var memo: String
     @Published var tagsText: String
+    @Published var attachments: [AttachmentDraft]
     @Published var errorMessage: String?
 
     private let editingIdea: Idea?
@@ -22,6 +23,10 @@ final class IdeaViewModel: ObservableObject {
         self.title = idea?.title ?? ""
         self.memo = idea?.memo ?? ""
         self.tagsText = idea?.tags.joined(separator: ", ") ?? ""
+        self.attachments = idea?.attachments
+            .sorted(by: { $0.createdAt < $1.createdAt })
+            .map(AttachmentDraft.init(from:))
+            ?? []
     }
 
     /// 画面入力を保存（新規 or 更新）
@@ -30,9 +35,20 @@ final class IdeaViewModel: ObservableObject {
 
         do {
             if let editingIdea {
-                try dataService.updateIdea(editingIdea, title: title, memo: memo, tags: parsedTags)
+                try dataService.updateIdea(
+                    editingIdea,
+                    title: title,
+                    memo: memo,
+                    tags: parsedTags,
+                    attachments: attachments
+                )
             } else {
-                try dataService.createIdea(title: title, memo: memo, tags: parsedTags)
+                try dataService.createIdea(
+                    title: title,
+                    memo: memo,
+                    tags: parsedTags,
+                    attachments: attachments
+                )
             }
             errorMessage = nil
             return true
@@ -40,6 +56,21 @@ final class IdeaViewModel: ObservableObject {
             errorMessage = error.localizedDescription
             return false
         }
+    }
+
+    func addAttachment(fileName: String, contentTypeIdentifier: String, data: Data) {
+        guard !data.isEmpty else { return }
+        attachments.append(
+            AttachmentDraft(
+                fileName: fileName,
+                contentTypeIdentifier: contentTypeIdentifier,
+                data: data
+            )
+        )
+    }
+
+    func removeAttachment(id: UUID) {
+        attachments.removeAll { $0.id == id }
     }
 
     private func parseTags(from input: String) -> [String] {

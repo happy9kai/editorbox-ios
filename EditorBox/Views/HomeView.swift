@@ -26,6 +26,7 @@ struct HomeView: View {
             idea.title.localizedCaseInsensitiveContains(keyword)
             || idea.memo.localizedCaseInsensitiveContains(keyword)
             || idea.tags.contains(where: { $0.localizedCaseInsensitiveContains(keyword) })
+            || idea.attachments.contains(where: { $0.fileName.localizedCaseInsensitiveContains(keyword) })
         }
     }
 
@@ -120,6 +121,12 @@ private struct IdeaRowView: View {
                         .foregroundStyle(.blue)
                         .lineLimit(1)
                 }
+
+                if !idea.attachments.isEmpty {
+                    Label("\(idea.attachments.count)", systemImage: "paperclip")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(.vertical, 4)
@@ -128,5 +135,5 @@ private struct IdeaRowView: View {
 
 #Preview {
     HomeView()
-        .modelContainer(for: Idea.self, inMemory: true)
+        .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
 }

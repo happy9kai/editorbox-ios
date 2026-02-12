@@ -7,6 +7,11 @@
 
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -37,6 +42,17 @@ struct DetailView: View {
                         .font(.body)
                         .foregroundStyle(idea.memo.isEmpty ? .secondary : .primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                if !sortedAttachments.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("添付ファイル")
+                            .font(.headline)
+
+                        ForEach(sortedAttachments) { attachment in
+                            AttachmentCardView(attachment: attachment)
+                        }
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -94,6 +110,10 @@ struct DetailView: View {
         }
     }
 
+    private var sortedAttachments: [IdeaAttachment] {
+        idea.attachments.sorted(by: { $0.createdAt < $1.createdAt })
+    }
+
     private func deleteIdea() {
         do {
             try DataService(context: modelContext).deleteIdea(idea)
@@ -128,19 +148,82 @@ private struct TagSectionView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(
-        for: Idea.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    let idea = Idea(
-        title: "プレビュー用メモ",
-        memo: "ここに詳細メモが表示されます。",
-        tags: ["SwiftUI", "SwiftData"]
-    )
-    container.mainContext.insert(idea)
-
-    return NavigationStack {
-        DetailView(idea: idea)
+    NavigationStack {
+        DetailView(
+            idea: Idea(
+                title: "プレビュー用メモ",
+                memo: "ここに詳細メモが表示されます。",
+                tags: ["SwiftUI", "SwiftData"],
+                attachments: [
+                    IdeaAttachment(
+                        fileName: "企画メモ.pdf",
+                        contentTypeIdentifier: "com.adobe.pdf",
+                        data: Data("dummy".utf8)
+                    )
+                ]
+            )
+        )
     }
-    .modelContainer(container)
+    .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
+}
+
+private struct AttachmentCardView: View {
+    let attachment: IdeaAttachment
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if attachment.isImage, let image = previewImage(from: attachment.data) {
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 170)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            HStack(alignment: .center, spacing: 10) {
+                Group {
+                    if attachment.isPDF {
+                        Image(systemName: "doc.richtext")
+                            .foregroundStyle(.red)
+                    } else if attachment.isImage {
+                        Image(systemName: "photo")
+                            .foregroundStyle(.blue)
+                    } else {
+                        Image(systemName: "doc")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .font(.headline)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(attachment.fileName)
+                        .font(.subheadline)
+                        .lineLimit(2)
+
+                    Text(attachment.formattedFileSize)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(12)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private func previewImage(from data: Data) -> Image? {
+#if canImport(UIKit)
+    if let image = UIImage(data: data) {
+        return Image(uiImage: image)
+    }
+#elseif canImport(AppKit)
+    if let image = NSImage(data: data) {
+        return Image(nsImage: image)
+    }
+#endif
+    return nil
 }
