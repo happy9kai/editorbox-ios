@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct GameHUDView: View {
+    @Environment(ThemeStore.self) private var themeStore
+
     let level: Int
     let coins: Int
     let characterSymbolName: String
     let showsLevelUpBanner: Bool
+
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
@@ -21,7 +27,7 @@ struct GameHUDView: View {
                     .fontWeight(.bold)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.green.opacity(0.92), in: Capsule())
+                    .background(theme.positive.opacity(0.92), in: Capsule())
                     .foregroundStyle(.white)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -29,24 +35,25 @@ struct GameHUDView: View {
             HStack(spacing: 8) {
                 Image(systemName: characterSymbolName)
                     .font(.headline)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(theme.accent)
 
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("Lv \(level)")
                         .font(.caption)
                         .fontWeight(.semibold)
+                        .foregroundStyle(theme.primaryText)
 
                     Text("\(coins) Coin")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(theme.secondaryText)
                 }
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
-            .background(.ultraThinMaterial, in: Capsule())
+            .background(theme.cardBackground, in: Capsule())
             .overlay(
                 Capsule()
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                    .stroke(theme.primaryText.opacity(0.15), lineWidth: 1)
             )
         }
         .animation(.easeInOut(duration: 0.25), value: showsLevelUpBanner)
@@ -60,4 +67,5 @@ struct GameHUDView: View {
         characterSymbolName: "person.crop.circle.badge.plus",
         showsLevelUpBanner: true
     )
+    .environment(ThemeStore())
 }

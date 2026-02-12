@@ -19,6 +19,8 @@ final class PlayerProgress {
     var totalChars: Int
     var totalSaves: Int
     var isSubscriber: Bool
+    var lastSavedMemoId: String?
+    var lastSavedMemoAt: Date?
 
     init(
         level: Int = 1,
@@ -29,7 +31,9 @@ final class PlayerProgress {
         lastRewardDate: Date = .distantPast,
         totalChars: Int = 0,
         totalSaves: Int = 0,
-        isSubscriber: Bool = false
+        isSubscriber: Bool = false,
+        lastSavedMemoId: String? = nil,
+        lastSavedMemoAt: Date? = nil
     ) {
         self.level = level
         self.xp = xp
@@ -40,6 +44,8 @@ final class PlayerProgress {
         self.totalChars = totalChars
         self.totalSaves = totalSaves
         self.isSubscriber = isSubscriber
+        self.lastSavedMemoId = lastSavedMemoId
+        self.lastSavedMemoAt = lastSavedMemoAt
     }
 }
 
@@ -49,11 +55,34 @@ final class OwnedItem {
     var type: String
     var owned: Bool
     var equipped: Bool
+    var obtainedAt: Date?
 
-    init(id: String, type: String, owned: Bool = false, equipped: Bool = false) {
-        self.id = id
+    init(
+        itemId: String,
+        type: String,
+        isOwned: Bool = false,
+        isEquipped: Bool = false,
+        obtainedAt: Date? = nil
+    ) {
+        self.id = itemId
         self.type = type
-        self.owned = owned
-        self.equipped = equipped
+        self.owned = isOwned
+        self.equipped = isEquipped
+        self.obtainedAt = obtainedAt
+    }
+
+    var itemId: String {
+        get { id }
+        set { id = newValue }
+    }
+
+    var isOwned: Bool {
+        get { owned }
+        set { owned = newValue }
+    }
+
+    var isEquipped: Bool {
+        get { equipped }
+        set { equipped = newValue }
     }
 }

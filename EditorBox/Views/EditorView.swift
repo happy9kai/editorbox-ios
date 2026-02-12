@@ -19,6 +19,7 @@ struct EditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Environment(GameStore.self) private var gameStore
+    @Environment(ThemeStore.self) private var themeStore
 
     @StateObject private var viewModel: IdeaViewModel
     @State private var isShowingFileImporter = false
@@ -28,56 +29,72 @@ struct EditorView: View {
         _viewModel = StateObject(wrappedValue: IdeaViewModel(idea: idea))
     }
 
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
+
     var body: some View {
         NavigationStack {
-            Form {
-                Section("タイトル") {
-                    TextField("例: 週末に作るアプリ案", text: $viewModel.title)
-                }
+            ZStack {
+                ThemedBackgroundView(theme: theme)
 
-                Section("メモ") {
-                    TextEditor(text: $viewModel.memo)
-                        .frame(minHeight: 180)
-                }
-
-                Section("タグ") {
-                    TextField("例: SwiftUI, 収益化, AI", text: $viewModel.tagsText)
-                        .textInputAutocapitalization(.never)
-                    Text("カンマ区切りで入力してください")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Section("添付ファイル") {
-                    PhotosPicker(
-                        selection: $selectedPhotoItems,
-                        maxSelectionCount: 20,
-                        matching: .images
-                    ) {
-                        Label("写真を追加", systemImage: "photo.on.rectangle")
+                Form {
+                    Section("タイトル") {
+                        TextField("例: 週末に作るアプリ案", text: $viewModel.title)
+                            .foregroundStyle(theme.primaryText)
                     }
+                    .listRowBackground(theme.cardBackground)
 
-                    Button {
-                        isShowingFileImporter = true
-                    } label: {
-                        Label("ファイルを追加", systemImage: "paperclip")
+                    Section("メモ") {
+                        TextEditor(text: $viewModel.memo)
+                            .frame(minHeight: 180)
+                            .foregroundStyle(theme.primaryText)
                     }
+                    .listRowBackground(theme.cardBackground)
 
-                    if viewModel.attachments.isEmpty {
-                        Text("写真、PDF、その他ファイルを添付できます。")
+                    Section("タグ") {
+                        TextField("例: SwiftUI, 収益化, AI", text: $viewModel.tagsText)
+                            .textInputAutocapitalization(.never)
+                            .foregroundStyle(theme.primaryText)
+                        Text("カンマ区切りで入力してください")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(viewModel.attachments) { attachment in
-                            AttachmentDraftRowView(
-                                attachment: attachment,
-                                onRemove: {
-                                    viewModel.removeAttachment(id: attachment.id)
-                                }
-                            )
+                            .foregroundStyle(theme.secondaryText)
+                    }
+                    .listRowBackground(theme.cardBackground)
+
+                    Section("添付ファイル") {
+                        PhotosPicker(
+                            selection: $selectedPhotoItems,
+                            maxSelectionCount: 20,
+                            matching: .images
+                        ) {
+                            Label("写真を追加", systemImage: "photo.on.rectangle")
+                        }
+
+                        Button {
+                            isShowingFileImporter = true
+                        } label: {
+                            Label("ファイルを追加", systemImage: "paperclip")
+                        }
+
+                        if viewModel.attachments.isEmpty {
+                            Text("写真、PDF、その他ファイルを添付できます。")
+                                .font(.caption)
+                                .foregroundStyle(theme.secondaryText)
+                        } else {
+                            ForEach(viewModel.attachments) { attachment in
+                                AttachmentDraftRowView(
+                                    attachment: attachment,
+                                    onRemove: {
+                                        viewModel.removeAttachment(id: attachment.id)
+                                    }
+                                )
+                            }
                         }
                     }
+                    .listRowBackground(theme.cardBackground)
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle(viewModel.title.isEmpty ? "新規メモ" : "メモ編集")
             .navigationBarTitleDisplayMode(.inline)
@@ -95,6 +112,7 @@ struct EditorView: View {
                     .fontWeight(.semibold)
                 }
             }
+            .tint(theme.accent)
             .alert("保存エラー", isPresented: Binding(get: {
                 viewModel.errorMessage != nil
             }, set: { newValue in
@@ -204,6 +222,7 @@ struct EditorView: View {
 #Preview {
     EditorView()
         .environment(GameStore())
+        .environment(ThemeStore())
         .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }
 

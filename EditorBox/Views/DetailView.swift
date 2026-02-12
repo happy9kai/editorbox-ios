@@ -16,6 +16,7 @@ import AppKit
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(ThemeStore.self) private var themeStore
 
     let idea: Idea
 
@@ -23,64 +24,80 @@ struct DetailView: View {
     @State private var isShowingDeleteConfirm = false
     @State private var alertMessage: String?
 
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text(idea.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
+        ZStack {
+            ThemedBackgroundView(theme: theme)
 
-                if !idea.tags.isEmpty {
-                    TagSectionView(tags: idea.tags)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text(idea.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(theme.primaryText)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("メモ")
-                        .font(.headline)
+                    if !idea.tags.isEmpty {
+                        TagSectionView(tags: idea.tags)
+                    }
 
-                    Text(idea.memo.isEmpty ? "（メモは未入力です）" : idea.memo)
-                        .font(.body)
-                        .foregroundStyle(idea.memo.isEmpty ? .secondary : .primary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-
-                if !sortedAttachments.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("添付ファイル")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("メモ")
                             .font(.headline)
+                            .foregroundStyle(theme.primaryText)
 
-                        ForEach(sortedAttachments) { attachment in
-                            AttachmentCardView(attachment: attachment)
+                        Text(idea.memo.isEmpty ? "（メモは未入力です）" : idea.memo)
+                            .font(.body)
+                            .foregroundStyle(idea.memo.isEmpty ? theme.secondaryText : theme.primaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    if !sortedAttachments.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("添付ファイル")
+                                .font(.headline)
+                                .foregroundStyle(theme.primaryText)
+
+                            ForEach(sortedAttachments) { attachment in
+                                AttachmentCardView(attachment: attachment)
+                            }
                         }
                     }
-                }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("作成日")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text(idea.createdAt, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("作成日")
+                            .font(.subheadline)
+                            .foregroundStyle(theme.secondaryText)
+                        Text(idea.createdAt, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
+                            .foregroundStyle(theme.primaryText)
 
-                    Text("更新日")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 8)
-                    Text(idea.updatedAt, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
-                }
+                        Text("更新日")
+                            .font(.subheadline)
+                            .foregroundStyle(theme.secondaryText)
+                            .padding(.top, 8)
+                        Text(idea.updatedAt, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
+                            .foregroundStyle(theme.primaryText)
+                    }
 
-                Button(role: .destructive) {
-                    isShowingDeleteConfirm = true
-                } label: {
-                    Label("このメモを削除", systemImage: "trash")
-                        .frame(maxWidth: .infinity)
+                    Button(role: .destructive) {
+                        isShowingDeleteConfirm = true
+                    } label: {
+                        Label("このメモを削除", systemImage: "trash")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.top, 12)
                 }
-                .buttonStyle(.bordered)
-                .padding(.top, 12)
+                .padding()
+                .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 18))
+                .padding(12)
             }
-            .padding()
         }
         .navigationTitle("詳細")
         .navigationBarTitleDisplayMode(.inline)
+        .tint(theme.accent)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("編集") {
@@ -125,12 +142,18 @@ struct DetailView: View {
 }
 
 private struct TagSectionView: View {
+    @Environment(ThemeStore.self) private var themeStore
     let tags: [String]
+
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("タグ")
                 .font(.headline)
+                .foregroundStyle(theme.primaryText)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -139,7 +162,8 @@ private struct TagSectionView: View {
                             .font(.caption)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(Color.blue.opacity(0.14), in: Capsule())
+                            .background(theme.accent.opacity(0.28), in: Capsule())
+                            .foregroundStyle(theme.primaryText)
                     }
                 }
             }
@@ -165,11 +189,17 @@ private struct TagSectionView: View {
         )
     }
     .environment(GameStore())
+    .environment(ThemeStore())
     .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }
 
 private struct AttachmentCardView: View {
+    @Environment(ThemeStore.self) private var themeStore
     let attachment: IdeaAttachment
+
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -190,10 +220,10 @@ private struct AttachmentCardView: View {
                             .foregroundStyle(.red)
                     } else if attachment.isImage {
                         Image(systemName: "photo")
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(theme.accent)
                     } else {
                         Image(systemName: "doc")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(theme.secondaryText)
                     }
                 }
                 .font(.headline)
@@ -201,18 +231,19 @@ private struct AttachmentCardView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(attachment.fileName)
                         .font(.subheadline)
+                        .foregroundStyle(theme.primaryText)
                         .lineLimit(2)
 
                     Text(attachment.formattedFileSize)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(theme.secondaryText)
                 }
 
                 Spacer(minLength: 0)
             }
         }
         .padding(12)
-        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 

@@ -17,5 +17,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(GameStore())
+        .environment(PurchaseService())
+        .environment(ThemeStore())
         .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }

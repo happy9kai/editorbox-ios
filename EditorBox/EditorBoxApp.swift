@@ -11,6 +11,8 @@ import SwiftData
 @main
 struct EditorBoxApp: App {
     @State private var gameStore = GameStore()
+    @State private var purchaseService = PurchaseService()
+    @State private var themeStore = ThemeStore()
 
     /// アプリ全体で共有する SwiftData コンテナ
     private var sharedModelContainer: ModelContainer = {
@@ -28,6 +30,8 @@ struct EditorBoxApp: App {
         WindowGroup {
             ContentView()
                 .environment(gameStore)
+                .environment(purchaseService)
+                .environment(themeStore)
         }
         .modelContainer(sharedModelContainer)
     }

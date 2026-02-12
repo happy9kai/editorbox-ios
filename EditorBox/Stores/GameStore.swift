@@ -13,8 +13,11 @@ import SwiftData
 @Observable
 final class GameStore {
     private(set) var level: Int = 1
+    private(set) var xp: Int = 0
     private(set) var coins: Int = 0
     private(set) var streakDays: Int = 0
+    private(set) var totalChars: Int = 0
+    private(set) var totalSaves: Int = 0
     private(set) var characterSymbolName: String = "person.crop.circle.fill"
     private(set) var isSubscriber: Bool = false
 
@@ -29,7 +32,6 @@ final class GameStore {
 
     @ObservationIgnored private var modelContext: ModelContext?
     @ObservationIgnored private var progressCache: PlayerProgress?
-    @ObservationIgnored private var lastRewardedSaveByMemoID: [String: Date] = [:]
     @ObservationIgnored private var hasShownMilestonePaywallThisSession = false
 
     func configure(modelContext: ModelContext) {
@@ -43,13 +45,16 @@ final class GameStore {
 
         let now = Date()
         updateStreak(for: progress, at: now)
+
+        let normalizedCharCount = max(0, charCount)
         progress.totalSaves += 1
-        progress.totalChars += max(0, charCount)
+        progress.totalChars += normalizedCharCount
         progress.lastSavedDate = now
 
-        if !isRewardThrottled(memoId: memoId, at: now) {
-            let gainedXP = calculateXPGain(charCount: charCount)
-            let gainedCoins = calculateCoinGain(charCount: charCount) * coinMultiplier(for: progress)
+        let isThrottled = isRewardThrottled(progress: progress, memoId: memoId, at: now)
+        if !isThrottled {
+            let gainedXP = calculateXPGain(charCount: normalizedCharCount)
+            let gainedCoins = calculateCoinGain(charCount: normalizedCharCount) * coinMultiplier(for: progress)
 
             progress.xp += gainedXP
             progress.coins += gainedCoins
@@ -76,10 +81,13 @@ final class GameStore {
 
     func claimDailyReward() {
         guard canClaimDailyReward, let progress = loadOrCreateProgress() else { return }
+
         progress.coins += dailyRewardAmount * coinMultiplier(for: progress)
         progress.lastRewardDate = .now
+
         canClaimDailyReward = false
         shouldShowDailyRewardSheet = false
+
         saveAndSync(progress: progress)
     }
 
@@ -89,6 +97,24 @@ final class GameStore {
 
     func dismissPaywall() {
         shouldShowPaywallSheet = false
+    }
+
+    func presentPremiumThemePaywall() {
+        presentPaywall(
+            title: "Premium限定テーマ",
+            message: "Premium登録で限定テーマを装備できます。"
+        )
+    }
+
+    func setSubscriberStatus(_ value: Bool) {
+        guard let progress = loadOrCreateProgress() else { return }
+        guard progress.isSubscriber != value else {
+            syncState(from: progress)
+            return
+        }
+
+        progress.isSubscriber = value
+        saveAndSync(progress: progress)
     }
 
     @discardableResult
@@ -110,13 +136,11 @@ final class GameStore {
     }
 
     private func calculateXPGain(charCount: Int) -> Int {
-        let normalized = max(0, charCount)
-        return 5 + min(normalized / 40, 25)
+        5 + min(charCount / 40, 25)
     }
 
     private func calculateCoinGain(charCount: Int) -> Int {
-        let normalized = max(0, charCount)
-        return 1 + min(normalized / 200, 5)
+        1 + min(charCount / 200, 5)
     }
 
     private func requiredXP(for level: Int) -> Int {
@@ -153,18 +177,17 @@ final class GameStore {
         }
     }
 
-    private func isRewardThrottled(memoId: String, at date: Date) -> Bool {
+    private func isRewardThrottled(progress: PlayerProgress, memoId: String, at date: Date) -> Bool {
         let normalizedMemoID = memoId.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !normalizedMemoID.isEmpty else { return false }
-
-        if let lastRewardDate = lastRewardedSaveByMemoID[normalizedMemoID] {
-            if date.timeIntervalSince(lastRewardDate) < 60 {
-                return true
-            }
+        defer {
+            progress.lastSavedMemoId = normalizedMemoID
+            progress.lastSavedMemoAt = date
         }
 
-        lastRewardedSaveByMemoID[normalizedMemoID] = date
-        return false
+        guard !normalizedMemoID.isEmpty else { return false }
+        guard progress.lastSavedMemoId == normalizedMemoID else { return false }
+        guard let lastSavedMemoAt = progress.lastSavedMemoAt else { return false }
+        return date.timeIntervalSince(lastSavedMemoAt) < 60
     }
 
     private func evaluateMilestonePaywallIfNeeded(progress: PlayerProgress) {
@@ -195,15 +218,18 @@ final class GameStore {
         do {
             try modelContext?.save()
         } catch {
-            // MVP段階では保存失敗時もクラッシュを避け、次回保存時に再試行する。
+            // MVP段階では保存失敗時もクラッシュを避ける。
         }
         syncState(from: progress)
     }
 
     private func syncState(from progress: PlayerProgress) {
         level = progress.level
+        xp = progress.xp
         coins = progress.coins
         streakDays = progress.streakDays
+        totalChars = progress.totalChars
+        totalSaves = progress.totalSaves
         isSubscriber = progress.isSubscriber
         characterSymbolName = characterSymbol(for: progress.level)
     }

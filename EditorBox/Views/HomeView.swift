@@ -11,13 +11,15 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(GameStore.self) private var gameStore
+    @Environment(PurchaseService.self) private var purchaseService
+    @Environment(ThemeStore.self) private var themeStore
     @Query(sort: [SortDescriptor(\Idea.updatedAt, order: .reverse)]) private var ideas: [Idea]
 
     @State private var searchText = ""
     @State private var isShowingEditor = false
     @State private var isShowingShop = false
     @State private var alertMessage: String?
-    @State private var hasInitializedGameStore = false
+    @State private var hasInitializedStores = false
 
     private var filteredIdeas: [Idea] {
         let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -33,31 +35,41 @@ struct HomeView: View {
         }
     }
 
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
+
     var body: some View {
         NavigationStack {
-            Group {
-                if filteredIdeas.isEmpty {
-                    ContentUnavailableView(
-                        "メモがありません",
-                        systemImage: "square.and.pencil",
-                        description: Text("右上の + ボタンからメモを追加できます。")
-                    )
-                } else {
-                    List(filteredIdeas) { idea in
-                        NavigationLink {
-                            DetailView(idea: idea)
-                        } label: {
-                            IdeaRowView(idea: idea)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                deleteIdea(idea)
+            ZStack {
+                ThemedBackgroundView(theme: theme)
+
+                Group {
+                    if filteredIdeas.isEmpty {
+                        ContentUnavailableView(
+                            "メモがありません",
+                            systemImage: "square.and.pencil",
+                            description: Text("右上の + ボタンからメモを追加できます。")
+                        )
+                    } else {
+                        List(filteredIdeas) { idea in
+                            NavigationLink {
+                                DetailView(idea: idea)
                             } label: {
-                                Label("削除", systemImage: "trash")
+                                IdeaRowView(idea: idea)
+                            }
+                            .listRowBackground(theme.cardBackground)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    deleteIdea(idea)
+                                } label: {
+                                    Label("削除", systemImage: "trash")
+                                }
                             }
                         }
+                        .scrollContentBackground(.hidden)
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                 }
             }
             .navigationTitle("EditorBox")
@@ -78,6 +90,7 @@ struct HomeView: View {
                     }
                 }
             }
+            .tint(theme.accent)
             .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "タイトル・メモ・タグで検索")
             .sheet(isPresented: $isShowingEditor) {
                 EditorView()
@@ -106,11 +119,18 @@ struct HomeView: View {
                 PremiumPaywallView()
             }
             .task {
-                if !hasInitializedGameStore {
-                    hasInitializedGameStore = true
+                if !hasInitializedStores {
+                    hasInitializedStores = true
                     gameStore.configure(modelContext: modelContext)
+                    purchaseService.start()
+                    let isPremium = await purchaseService.refreshEntitlementStatus()
+                    gameStore.setSubscriberStatus(isPremium)
+                    themeStore.configure(modelContext: modelContext, isSubscriber: isPremium)
                     gameStore.checkDailyReward()
                 }
+            }
+            .onChange(of: gameStore.isSubscriber) { _, isSubscriber in
+                themeStore.refreshSubscriptionState(isSubscriber: isSubscriber)
             }
             .alert("エラー", isPresented: Binding(get: {
                 alertMessage != nil
@@ -136,37 +156,44 @@ struct HomeView: View {
 }
 
 private struct IdeaRowView: View {
+    @Environment(ThemeStore.self) private var themeStore
+
     let idea: Idea
+
+    private var theme: AppThemePalette {
+        themeStore.currentTheme
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(idea.title)
                 .font(.headline)
+                .foregroundStyle(theme.primaryText)
                 .lineLimit(1)
 
             if !idea.memo.isEmpty {
                 Text(idea.memo)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(theme.secondaryText)
                     .lineLimit(2)
             }
 
             HStack(spacing: 8) {
                 Text(idea.updatedAt, format: Date.FormatStyle(date: .abbreviated, time: .shortened))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(theme.secondaryText)
 
                 if !idea.tags.isEmpty {
                     Text(idea.tags.map { "#\($0)" }.joined(separator: " "))
                         .font(.caption)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(theme.accent)
                         .lineLimit(1)
                 }
 
                 if !idea.attachments.isEmpty {
                     Label("\(idea.attachments.count)", systemImage: "paperclip")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(theme.secondaryText)
                 }
             }
         }
@@ -177,5 +204,7 @@ private struct IdeaRowView: View {
 #Preview {
     HomeView()
         .environment(GameStore())
+        .environment(PurchaseService())
+        .environment(ThemeStore())
         .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }
