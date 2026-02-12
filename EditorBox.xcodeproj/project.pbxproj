@@ -6,8 +6,51 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		70B200000000000000000001 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000002 /* ShareViewController.swift */; };
+		70B200000000000000000002 /* ShareImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000003 /* ShareImportView.swift */; };
+		70B200000000000000000003 /* ShareImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000004 /* ShareImportViewModel.swift */; };
+		70B200000000000000000004 /* AppGroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000007 /* AppGroupStore.swift */; };
+		70B200000000000000000005 /* Idea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000008 /* Idea.swift */; };
+		70B200000000000000000006 /* GameProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000009 /* GameProgress.swift */; };
+		70B200000000000000000007 /* EditorBoxShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 70B100000000000000000001 /* EditorBoxShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		70B600000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 69ACB6E32F38B7360097BFC2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 70B500000000000000000001;
+			remoteInfo = EditorBoxShareExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		70B400000000000000000004 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				70B200000000000000000007 /* EditorBoxShareExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		69ACB6EB2F38B7360097BFC2 /* EditorBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EditorBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		70B100000000000000000001 /* EditorBoxShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EditorBoxShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		70B100000000000000000002 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		70B100000000000000000003 /* ShareImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareImportView.swift; sourceTree = "<group>"; };
+		70B100000000000000000004 /* ShareImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareImportViewModel.swift; sourceTree = "<group>"; };
+		70B100000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		70B100000000000000000006 /* EditorBoxShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EditorBoxShareExtension.entitlements; sourceTree = "<group>"; };
+		70B100000000000000000007 /* AppGroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBox/Shared/AppGroupStore.swift; sourceTree = "<group>"; };
+		70B100000000000000000008 /* Idea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBox/Models/Idea.swift; sourceTree = "<group>"; };
+		70B100000000000000000009 /* GameProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBox/Models/GameProgress.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +69,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		70B400000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,6 +83,8 @@
 			isa = PBXGroup;
 			children = (
 				69ACB6ED2F38B7360097BFC2 /* EditorBox */,
+				70B300000000000000000001 /* EditorBoxShareExtension */,
+				70B300000000000000000002 /* ShareExtensionShared */,
 				69ACB6EC2F38B7360097BFC2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +93,31 @@
 			isa = PBXGroup;
 			children = (
 				69ACB6EB2F38B7360097BFC2 /* EditorBox.app */,
+				70B100000000000000000001 /* EditorBoxShareExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		70B300000000000000000001 /* EditorBoxShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				70B100000000000000000002 /* ShareViewController.swift */,
+				70B100000000000000000003 /* ShareImportView.swift */,
+				70B100000000000000000004 /* ShareImportViewModel.swift */,
+				70B100000000000000000005 /* Info.plist */,
+				70B100000000000000000006 /* EditorBoxShareExtension.entitlements */,
+			);
+			path = EditorBoxShareExtension;
+			sourceTree = "<group>";
+		};
+		70B300000000000000000002 /* ShareExtensionShared */ = {
+			isa = PBXGroup;
+			children = (
+				70B100000000000000000007 /* AppGroupStore.swift */,
+				70B100000000000000000008 /* Idea.swift */,
+				70B100000000000000000009 /* GameProgress.swift */,
+			);
+			name = ShareExtensionShared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +130,12 @@
 				69ACB6E72F38B7360097BFC2 /* Sources */,
 				69ACB6E82F38B7360097BFC2 /* Frameworks */,
 				69ACB6E92F38B7360097BFC2 /* Resources */,
+				70B400000000000000000004 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				70B600000000000000000002 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				69ACB6ED2F38B7360097BFC2 /* EditorBox */,
@@ -69,6 +146,25 @@
 			productName = EditorBox;
 			productReference = 69ACB6EB2F38B7360097BFC2 /* EditorBox.app */;
 			productType = "com.apple.product-type.application";
+		};
+		70B500000000000000000001 /* EditorBoxShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 70B800000000000000000001 /* Build configuration list for PBXNativeTarget "EditorBoxShareExtension" */;
+			buildPhases = (
+				70B400000000000000000001 /* Sources */,
+				70B400000000000000000002 /* Frameworks */,
+				70B400000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EditorBoxShareExtension;
+			packageProductDependencies = (
+			);
+			productName = EditorBoxShareExtension;
+			productReference = 70B100000000000000000001 /* EditorBoxShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +177,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					69ACB6EA2F38B7360097BFC2 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					70B500000000000000000001 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -100,12 +199,20 @@
 			projectRoot = "";
 			targets = (
 				69ACB6EA2F38B7360097BFC2 /* EditorBox */,
+				70B500000000000000000001 /* EditorBoxShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		69ACB6E92F38B7360097BFC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		70B400000000000000000003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +229,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		70B400000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70B200000000000000000001 /* ShareViewController.swift in Sources */,
+				70B200000000000000000002 /* ShareImportView.swift in Sources */,
+				70B200000000000000000003 /* ShareImportViewModel.swift in Sources */,
+				70B200000000000000000004 /* AppGroupStore.swift in Sources */,
+				70B200000000000000000005 /* Idea.swift in Sources */,
+				70B200000000000000000006 /* GameProgress.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		70B600000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 70B500000000000000000001 /* EditorBoxShareExtension */;
+			targetProxy = 70B600000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		69ACB6F62F38B7360097BFC2 /* Debug */ = {
@@ -244,6 +372,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EditorBox/EditorBox.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -286,6 +415,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EditorBox/EditorBox.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -323,6 +453,63 @@
 			};
 			name = Release;
 		};
+		70B700000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EditorBoxShareExtension/EditorBoxShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = EditorBoxShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.imidefworks.EditorBox.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		70B700000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EditorBoxShareExtension/EditorBoxShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = EditorBoxShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.imidefworks.EditorBox.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -340,6 +527,15 @@
 			buildConfigurations = (
 				69ACB6F92F38B7360097BFC2 /* Debug */,
 				69ACB6FA2F38B7360097BFC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		70B800000000000000000001 /* Build configuration list for PBXNativeTarget "EditorBoxShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70B700000000000000000001 /* Debug */,
+				70B700000000000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

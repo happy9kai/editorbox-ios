@@ -10,6 +10,7 @@ import SwiftData
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(GameStore.self) private var gameStore
     @Environment(PurchaseService.self) private var purchaseService
     @Environment(ThemeStore.self) private var themeStore
@@ -20,6 +21,7 @@ struct HomeView: View {
     @State private var isShowingShop = false
     @State private var alertMessage: String?
     @State private var hasInitializedStores = false
+    @State private var refreshToken = UUID()
 
     private var filteredIdeas: [Idea] {
         let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -71,6 +73,7 @@ struct HomeView: View {
                         .listStyle(.plain)
                     }
                 }
+                .id(refreshToken)
             }
             .navigationTitle("EditorBox")
             .toolbar {
@@ -131,6 +134,11 @@ struct HomeView: View {
             }
             .onChange(of: gameStore.isSubscriber) { _, isSubscriber in
                 themeStore.refreshSubscriptionState(isSubscriber: isSubscriber)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active else { return }
+                refreshToken = UUID()
+                gameStore.configure(modelContext: modelContext)
             }
             .alert("エラー", isPresented: Binding(get: {
                 alertMessage != nil

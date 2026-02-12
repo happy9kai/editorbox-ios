@@ -14,6 +14,7 @@ final class PlayerProgress {
     var xp: Int
     var coins: Int
     var streakDays: Int
+    var notesImportedCount: Int
     var lastSavedDate: Date
     var lastRewardDate: Date
     var totalChars: Int
@@ -27,6 +28,7 @@ final class PlayerProgress {
         xp: Int = 0,
         coins: Int = 0,
         streakDays: Int = 0,
+        notesImportedCount: Int = 0,
         lastSavedDate: Date = .distantPast,
         lastRewardDate: Date = .distantPast,
         totalChars: Int = 0,
@@ -39,6 +41,7 @@ final class PlayerProgress {
         self.xp = xp
         self.coins = coins
         self.streakDays = streakDays
+        self.notesImportedCount = notesImportedCount
         self.lastSavedDate = lastSavedDate
         self.lastRewardDate = lastRewardDate
         self.totalChars = totalChars
