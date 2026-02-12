@@ -10,9 +10,11 @@ import SwiftData
 
 @main
 struct EditorBoxApp: App {
+    @State private var gameStore = GameStore()
+
     /// アプリ全体で共有する SwiftData コンテナ
     private var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Idea.self, IdeaAttachment.self])
+        let schema = Schema([Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -25,6 +27,7 @@ struct EditorBoxApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(gameStore)
         }
         .modelContainer(sharedModelContainer)
     }

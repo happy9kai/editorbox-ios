@@ -16,5 +16,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
+        .environment(GameStore())
+        .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }

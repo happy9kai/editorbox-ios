@@ -18,6 +18,7 @@ import AppKit
 struct EditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(GameStore.self) private var gameStore
 
     @StateObject private var viewModel: IdeaViewModel
     @State private var isShowingFileImporter = false
@@ -116,14 +117,24 @@ struct EditorView: View {
                     await importPhotos(from: newItems)
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                GameHUDView(
+                    level: gameStore.level,
+                    coins: gameStore.coins,
+                    characterSymbolName: gameStore.characterSymbolName,
+                    showsLevelUpBanner: gameStore.shouldShowLevelUpBanner
+                )
+                .padding(.trailing, 16)
+                .padding(.top, 8)
+            }
         }
     }
 
     private func saveIdea() {
         let dataService = DataService(context: modelContext)
-        let isSuccess = viewModel.save(using: dataService)
-
-        if isSuccess {
+        if let saveResult = viewModel.save(using: dataService) {
+            gameStore.configure(modelContext: modelContext)
+            gameStore.handleMemoSaved(charCount: saveResult.charCount, memoId: saveResult.memoId)
             dismiss()
         }
     }
@@ -192,7 +203,8 @@ struct EditorView: View {
 
 #Preview {
     EditorView()
-        .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
+        .environment(GameStore())
+        .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }
 
 private struct AttachmentDraftRowView: View {

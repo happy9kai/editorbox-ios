@@ -10,6 +10,11 @@ import Combine
 
 @MainActor
 final class IdeaViewModel: ObservableObject {
+    struct SaveResult {
+        let memoId: String
+        let charCount: Int
+    }
+
     @Published var title: String
     @Published var memo: String
     @Published var tagsText: String
@@ -30,10 +35,11 @@ final class IdeaViewModel: ObservableObject {
     }
 
     /// 画面入力を保存（新規 or 更新）
-    func save(using dataService: DataService) -> Bool {
+    func save(using dataService: DataService) -> SaveResult? {
         let parsedTags = parseTags(from: tagsText)
 
         do {
+            let savedIdea: Idea
             if let editingIdea {
                 try dataService.updateIdea(
                     editingIdea,
@@ -42,8 +48,9 @@ final class IdeaViewModel: ObservableObject {
                     tags: parsedTags,
                     attachments: attachments
                 )
+                savedIdea = editingIdea
             } else {
-                try dataService.createIdea(
+                savedIdea = try dataService.createIdea(
                     title: title,
                     memo: memo,
                     tags: parsedTags,
@@ -51,10 +58,10 @@ final class IdeaViewModel: ObservableObject {
                 )
             }
             errorMessage = nil
-            return true
+            return SaveResult(memoId: savedIdea.id.uuidString, charCount: memo.count)
         } catch {
             errorMessage = error.localizedDescription
-            return false
+            return nil
         }
     }
 

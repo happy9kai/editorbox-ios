@@ -164,7 +164,8 @@ private struct TagSectionView: View {
             )
         )
     }
-    .modelContainer(for: [Idea.self, IdeaAttachment.self], inMemory: true)
+    .environment(GameStore())
+    .modelContainer(for: [Idea.self, IdeaAttachment.self, PlayerProgress.self, OwnedItem.self], inMemory: true)
 }
 
 private struct AttachmentCardView: View {
